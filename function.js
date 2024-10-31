@@ -84,7 +84,8 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
     `;
 
     const originalHTML = `
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
     <style>${customCSS}</style>
     <div class="main">
         <button class="button" id="download">Download</button>
@@ -97,22 +98,18 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
             button.innerText = 'DOWNLOADING...';
             button.className = 'downloading';
 
-            var opt = {
-                margin: ${margin},
-                filename: '${fileName}.jpg',
-                html2canvas: {
-                    useCORS: true,
-                    scale: ${quality}
-                },
-                jsPDF: {
+            html2canvas(element, { scale: ${quality}, useCORS: true }).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                var pdf = new jsPDF({
+                    orientation: 'portrait',
                     unit: 'px',
                     format: [${finalDimensions[0]}, ${finalDimensions[1]}],
                     hotfixes: ['px_scaling']
-                },
-                imageType: 'jpeg'
-            };
-            
-            html2pdf().set(opt).from(element).save().then(function() {
+                });
+                pdf.addImage(imgData, 'JPEG', 0, 0, ${finalDimensions[0]}, ${finalDimensions[1]});
+                pdf.save('${fileName}.jpg');
+                
                 button.innerText = 'DOWNLOAD DONE';
                 button.className = 'done';
                 setTimeout(function() { 
