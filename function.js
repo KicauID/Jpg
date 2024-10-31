@@ -1,5 +1,4 @@
-window.function = function (html, fileName, format, zoom, orientation, margin, fidelity, customDimensions) {
-    // FIDELITY MAPPING
+window.function = function (html, fileName, format, zoom, margin, fidelity) {
     const fidelityMap = {
         low: 1,
         standard: 1.5,
@@ -10,66 +9,25 @@ window.function = function (html, fileName, format, zoom, orientation, margin, f
 
     html = html.value ?? "No HTML set.";
     fileName = fileName.value ?? "file";
-    format = format.value ?? "3";
+    format = format.value ?? "A4";
     zoom = zoom.value ?? "1";
-    orientation = orientation.value ?? "portrait";
     margin = margin.value ?? "0";
     const quality = fidelityMap[fidelity.value] ?? 4;
-    customDimensions = customDimensions.value ? customDimensions.value.split(",").map(Number) : null;
 
     const formatDimensions = {
-        1: [350, 350],
-        2: [350, 350],
-        3: [350, 525],
-        4: [350, 700],
-        5: [350, 875],
-        6: [350, 1050],
-        7: [350, 1225],
-        8: [350, 1400],
-        9: [350, 1575],
-        10: [350, 1750],
-        11: [350, 1925],
-        12: [350, 2100],
-        13: [350, 2275],
-        14: [350, 2450],
-        15: [350, 2625],
-        16: [350, 2800],
-        17: [350, 2975],
-        18: [350, 3150],
-        19: [350, 3325],
-        20: [350, 3500],
-        21: [350, 3675],
-        22: [350, 3850],
-        23: [350, 4025],
-        24: [350, 4200],
-        25: [350, 4375],
-        26: [350, 4550],
-        27: [350, 4725],
-        28: [350, 4900],
-        29: [350, 5075],
-        30: [350, 5250],
-        31: [350, 5425],
-        32: [350, 5600],
-        33: [350, 5775],
-        34: [350, 5950],
-        35: [350, 6125],
-        36: [350, 6300],
-        invoice: [350, 650],
         A6: [350, 495],
         A4: [794, 1123],
     };
 
-    const dimensions = customDimensions || formatDimensions[format];
+    const dimensions = formatDimensions[format];
     const finalDimensions = dimensions.map((dimension) => Math.round(dimension / zoom));
 
-    // LOG SETTINGS TO CONSOLE
     console.log(
         `Filename: ${fileName}\n` +
         `Format: ${format}\n` +
         `Dimensions: ${dimensions}\n` +
         `Zoom: ${zoom}\n` +
         `Final Dimensions: ${finalDimensions}\n` +
-        `Orientation: ${orientation}\n` +
         `Margin: ${margin}\n` +
         `Quality: ${quality}`
     );
@@ -104,7 +62,7 @@ window.function = function (html, fileName, format, zoom, orientation, margin, f
         color: #000000;
     }
 
-    .button.printing {
+    .button.downloading {
         background: #ffffff;
         color: #000000;
     }
@@ -129,37 +87,36 @@ window.function = function (html, fileName, format, zoom, orientation, margin, f
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <style>${customCSS}</style>
     <div class="main">
-        <button class="button" id="print">Print</button>
+        <button class="button" id="download">Download</button>
         <div id="content" class="content thermal-${format}">${html}</div>
     </div>
     <script>
-        document.getElementById('print').addEventListener('click', function() {
+        document.getElementById('download').addEventListener('click', function() {
             var element = document.getElementById('content');
             var button = this;
-            button.innerText = 'PRINTING...';
-            button.className = 'printing';
+            button.innerText = 'DOWNLOADING...';
+            button.className = 'downloading';
 
             var opt = {
                 margin: ${margin},
-                filename: '${fileName}',
+                filename: '${fileName}.jpg',
                 html2canvas: {
                     useCORS: true,
                     scale: ${quality}
                 },
                 jsPDF: {
                     unit: 'px',
-                    orientation: '${orientation}',
                     format: [${finalDimensions[0]}, ${finalDimensions[1]}],
                     hotfixes: ['px_scaling']
-                }
+                },
+                imageType: 'jpeg'
             };
-            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function(pdf) {
-                pdf.autoPrint();
-                window.open(pdf.output('bloburl'), '_blank');
-                button.innerText = 'PRINT DONE';
+            
+            html2pdf().set(opt).from(element).save().then(function() {
+                button.innerText = 'DOWNLOAD DONE';
                 button.className = 'done';
                 setTimeout(function() { 
-                    button.innerText = 'Print';
+                    button.innerText = 'Download';
                     button.className = ''; 
                 }, 2000);
             });
