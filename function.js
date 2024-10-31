@@ -38,7 +38,7 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
     }
 
     .button {
-        width: 100%;
+        width: 120px; /* Atur lebar tombol */
         border-radius: 0;
         font-size: 14px;
         font-weight: 600;
@@ -51,9 +51,9 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
         text-transform: uppercase;
         cursor: pointer;
         box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 1px 2.5px rgba(0, 0, 0, 0.1);
-        position: fixed;
-        top: 0;
-        z-index: 1000;
+        position: absolute; /* Ubah menjadi absolute */
+        left: 10px; /* Sesuaikan posisi ke kiri */
+        top: 10px; /* Sesuaikan posisi ke atas */
         background: #0353A7;
     }
 
@@ -89,7 +89,7 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
     <style>${customCSS}</style>
     <div class="main">
         <button class="button" id="download">Download</button>
-        <div id="content" class="content thermal-${format}">${html}</div>
+        <div id="content" class="content thermal-${format}" style="margin-top: 50px;">${html}</div>
     </div>
     <script>
         document.getElementById('download').addEventListener('click', function() {
@@ -108,7 +108,7 @@ window.function = function (html, fileName, format, zoom, margin, fidelity) {
                     hotfixes: ['px_scaling']
                 });
                 pdf.addImage(imgData, 'JPEG', 0, 0, ${finalDimensions[0]}, ${finalDimensions[1]});
-                pdf.save('${fileName}.jpg');
+                pdf.save('${fileName}.pdf'); // Ubah format menjadi PDF untuk kualitas tinggi
                 
                 button.innerText = 'DOWNLOAD DONE';
                 button.className = 'done';
